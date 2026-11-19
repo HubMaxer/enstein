@@ -12,19 +12,22 @@
         h1 { color: #ffd700; margin-top: 0; font-size: 2.5em; }
         h2 { font-size: 1.4em; margin-bottom: 20px; }
         
+        /* Фотка Эйнштейна */
+        .einstein-img { width: 200px; border-radius: 50%; border: 4px solid #ffd700; margin: 20px auto; display: block; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+        
         /* Кнопки */
         .btn { display: block; width: 100%; padding: 15px; margin: 12px 0; background: #2a2a2a; color: white; border: 2px solid #444; border-radius: 8px; font-size: 1.2em; cursor: pointer; transition: 0.2s; font-weight: bold; }
         .btn:hover { background: #3a3a3a; border-color: #777; }
         .btn.correct { background: #2e7d32; border-color: #4caf50; }
         .btn.wrong { background: #c62828; border-color: #f44336; }
         
-        /* Кнопка Далее (изначально скрыта) */
+        /* Кнопка Далее */
         #next-btn { display: none; background: #ffd700; color: #121212; border: none; margin-top: 20px; font-size: 1.3em; padding: 15px; }
         #next-btn:hover { background: #ffeb3b; }
 
         /* Страницы */
         #start-page, #quiz-page, #zapis-page { display: none; }
-        #start-page { display: block; } /* Стартуем с титульной */
+        #start-page { display: block; }
         
         #zapis-page { text-align: left; line-height: 1.6; }
         #zapis-page h2 { color: #ffd700; text-align: center; }
@@ -35,6 +38,7 @@
 <div class="container">
     <!-- 1. Титульный экран -->
     <div id="start-page">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Albert_Einstein_Head.jpg/220px-Albert_Einstein_Head.jpg" alt="Einstein s vyplazeným jazykem" class="einstein-img">
         <h1>Albert Einstein</h1>
         <p style="font-size: 1.2em; margin-bottom: 40px;">Génius, který změnil svět</p>
         <button class="btn" onclick="startQuiz()">Začít kvíz</button>
@@ -55,12 +59,16 @@
         <p>Byl to geniální fyzik, který změnil naše chápání vesmíru.</p>
         <p>Jeho nejslavnější rovnice je <strong>E = mc²</strong>. To znamená, že hmota a energie jsou propojené. Malé množství hmoty dokáže uvolnit obrovské množství energie.</p>
         <p>Dostal Nobelovu cenu za objev fotoelektrického jevu.</p>
-        <!-- ТУТ МОЖЕШЬ ДОБАВИТЬ СВОЙ ТЕКСТ -->
     </div>
 </div>
 
 <script>
     const questions = [
+        {
+            question: "Na jaké vysoké škole Einstein vystudoval?",
+            options: ["Oxfordská univerzita", "ETH Zürich (Curych)", "Harvardova univerzita"],
+            correct: 1 // Индекс 1 = второй вариант (ETH Zürich)
+        },
         {
             question: "Za co dostal Einstein Nobelovu cenu?",
             options: ["Za teorii relativity", "Za fotoelektrický jev", "Za vynález atomové bomby"],
@@ -91,7 +99,7 @@
         const q = questions[currentQuestion];
         questionText.innerHTML = `<h2>${q.question}</h2>`;
         optionsContainer.innerHTML = "";
-        nextBtn.style.display = "none"; // Скрываем кнопку "Далее" при новом вопросе
+        nextBtn.style.display = "none";
 
         q.options.forEach((opt, index) => {
             const btn = document.createElement('button');
@@ -103,30 +111,24 @@
     }
 
     function checkAnswer(button, isCorrect) {
-        // Отключаем кнопки ответов
         const allBtns = optionsContainer.querySelectorAll('.btn');
         allBtns.forEach(b => b.disabled = true);
 
-        // Красим правильный/неправильный ответ
         if (isCorrect) {
             button.classList.add('correct');
         } else {
             button.classList.add('wrong');
-            // Опционально: можно показать правильный ответ
             allBtns[questions[currentQuestion].correct].classList.add('correct');
         }
 
-        // Показываем кнопку "Далее"
         nextBtn.style.display = "block";
     }
 
     function nextQuestion() {
         if (currentQuestion < questions.length - 1) {
-            // Если есть еще вопросы
             currentQuestion++;
             renderQuestion();
         } else {
-            // Если вопросы кончились - показываем запись
             quizPage.style.display = 'none';
             zapisPage.style.display = 'block';
         }
