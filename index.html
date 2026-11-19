@@ -3,58 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kvíz: Albert Einstein</title>
+    <title>Albert Einstein</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
         
         .container { width: 90%; max-width: 600px; padding: 30px; background: #1e1e1e; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.6); }
         
-        h1 { color: #ffd700; margin-top: 0; font-size: 2em; }
+        h1 { color: #ffd700; margin-top: 0; font-size: 2.5em; }
         h2 { font-size: 1.4em; margin-bottom: 20px; }
         
+        /* Кнопки */
         .btn { display: block; width: 100%; padding: 15px; margin: 12px 0; background: #2a2a2a; color: white; border: 2px solid #444; border-radius: 8px; font-size: 1.2em; cursor: pointer; transition: 0.2s; font-weight: bold; }
         .btn:hover { background: #3a3a3a; border-color: #777; }
-        
-        /* Стили для правильных и неправильных ответов */
         .btn.correct { background: #2e7d32; border-color: #4caf50; }
         .btn.wrong { background: #c62828; border-color: #f44336; }
         
-        /* Страница с конспектом */
-        #zapis-page { display: none; text-align: left; line-height: 1.6; }
+        /* Кнопка Далее (изначально скрыта) */
+        #next-btn { display: none; background: #ffd700; color: #121212; border: none; margin-top: 20px; font-size: 1.3em; padding: 15px; }
+        #next-btn:hover { background: #ffeb3b; }
+
+        /* Страницы */
+        #start-page, #quiz-page, #zapis-page { display: none; }
+        #start-page { display: block; } /* Стартуем с титульной */
+        
+        #zapis-page { text-align: left; line-height: 1.6; }
         #zapis-page h2 { color: #ffd700; text-align: center; }
-        #zapis-page p { font-size: 1.1em; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Экран Квиза -->
+    <!-- 1. Титульный экран -->
+    <div id="start-page">
+        <h1>Albert Einstein</h1>
+        <p style="font-size: 1.2em; margin-bottom: 40px;">Génius, který změnil svět</p>
+        <button class="btn" onclick="startQuiz()">Začít kvíz</button>
+    </div>
+
+    <!-- 2. Экран Квиза -->
     <div id="quiz-page">
         <h1>Kvíz</h1>
         <div id="question-text"><h2>Načítání...</h2></div>
-        <div id="options-container">
-            <!-- Кнопки генерируются в JS -->
-        </div>
+        <div id="options-container"></div>
+        <button id="next-btn" onclick="nextQuestion()">Další</button>
     </div>
 
-    <!-- Экран Записи (пока пустой, потом вставишь свой текст) -->
+    <!-- 3. Экран Записи -->
     <div id="zapis-page">
         <h2>Zápis do sešitu</h2>
         <p><strong>Albert Einstein (1879–1955)</strong></p>
         <p>Byl to geniální fyzik, který změnil naše chápání vesmíru.</p>
         <p>Jeho nejslavnější rovnice je <strong>E = mc²</strong>. To znamená, že hmota a energie jsou propojené. Malé množství hmoty dokáže uvolnit obrovské množství energie.</p>
         <p>Dostal Nobelovu cenu za objev fotoelektrického jevu.</p>
-        <!-- ТУТ МОЖЕШЬ ДОБАВИТЬ СВОЙ ТЕКСТ ПОЗЖЕ -->
+        <!-- ТУТ МОЖЕШЬ ДОБАВИТЬ СВОЙ ТЕКСТ -->
     </div>
 </div>
 
 <script>
-    // Список вопросов
     const questions = [
         {
             question: "Za co dostal Einstein Nobelovu cenu?",
             options: ["Za teorii relativity", "Za fotoelektrický jev", "Za vynález atomové bomby"],
-            correct: 1 // Индекс правильного ответа (0 = A, 1 = B, 2 = C)
+            correct: 1
         },
         {
             question: "Co znamená rovnice E = mc²?",
@@ -64,54 +74,63 @@
     ];
 
     let currentQuestion = 0;
+    const startPage = document.getElementById('start-page');
     const quizPage = document.getElementById('quiz-page');
     const zapisPage = document.getElementById('zapis-page');
     const questionText = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
+    const nextBtn = document.getElementById('next-btn');
 
-    // Функция отрисовки вопроса
+    function startQuiz() {
+        startPage.style.display = 'none';
+        quizPage.style.display = 'block';
+        renderQuestion();
+    }
+
     function renderQuestion() {
         const q = questions[currentQuestion];
         questionText.innerHTML = `<h2>${q.question}</h2>`;
         optionsContainer.innerHTML = "";
+        nextBtn.style.display = "none"; // Скрываем кнопку "Далее" при новом вопросе
 
         q.options.forEach((opt, index) => {
             const btn = document.createElement('button');
             btn.className = "btn";
-            btn.innerText = `${String.fromCharCode(65 + index)}) ${opt}`; // A) Текст, B) Текст и т.д.
+            btn.innerText = `${String.fromCharCode(65 + index)}) ${opt}`;
             btn.onclick = () => checkAnswer(btn, index === q.correct);
             optionsContainer.appendChild(btn);
         });
     }
 
-    // Функция проверки ответа
     function checkAnswer(button, isCorrect) {
-        // Отключаем все кнопки, чтобы нельзя было нажать несколько раз
+        // Отключаем кнопки ответов
         const allBtns = optionsContainer.querySelectorAll('.btn');
         allBtns.forEach(b => b.disabled = true);
 
+        // Красим правильный/неправильный ответ
         if (isCorrect) {
             button.classList.add('correct');
         } else {
             button.classList.add('wrong');
+            // Опционально: можно показать правильный ответ
+            allBtns[questions[currentQuestion].correct].classList.add('correct');
         }
 
-        // Ждем 3 секунды и переключаем экран
-        setTimeout(() => {
-            if (currentQuestion < questions.length - 1) {
-                // Если есть еще вопросы - показываем следующий
-                currentQuestion++;
-                renderQuestion();
-            } else {
-                // Если вопросы кончились - показываем запись
-                quizPage.style.display = 'none';
-                zapisPage.style.display = 'block';
-            }
-        }, 3000); // 3000 миллисекунд = 3 секунды
+        // Показываем кнопку "Далее"
+        nextBtn.style.display = "block";
     }
 
-    // Запуск
-    renderQuestion();
+    function nextQuestion() {
+        if (currentQuestion < questions.length - 1) {
+            // Если есть еще вопросы
+            currentQuestion++;
+            renderQuestion();
+        } else {
+            // Если вопросы кончились - показываем запись
+            quizPage.style.display = 'none';
+            zapisPage.style.display = 'block';
+        }
+    }
 </script>
 
 </body>
