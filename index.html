@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kvíz: Albert Einstein</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
+        
+        .container { width: 90%; max-width: 600px; padding: 30px; background: #1e1e1e; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.6); }
+        
+        h1 { color: #ffd700; margin-top: 0; font-size: 2em; }
+        h2 { font-size: 1.4em; margin-bottom: 20px; }
+        
+        .btn { display: block; width: 100%; padding: 15px; margin: 12px 0; background: #2a2a2a; color: white; border: 2px solid #444; border-radius: 8px; font-size: 1.2em; cursor: pointer; transition: 0.2s; font-weight: bold; }
+        .btn:hover { background: #3a3a3a; border-color: #777; }
+        
+        /* Стили для правильных и неправильных ответов */
+        .btn.correct { background: #2e7d32; border-color: #4caf50; }
+        .btn.wrong { background: #c62828; border-color: #f44336; }
+        
+        /* Страница с конспектом */
+        #zapis-page { display: none; text-align: left; line-height: 1.6; }
+        #zapis-page h2 { color: #ffd700; text-align: center; }
+        #zapis-page p { font-size: 1.1em; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Экран Квиза -->
+    <div id="quiz-page">
+        <h1>Kvíz</h1>
+        <div id="question-text"><h2>Načítání...</h2></div>
+        <div id="options-container">
+            <!-- Кнопки генерируются в JS -->
+        </div>
+    </div>
+
+    <!-- Экран Записи (пока пустой, потом вставишь свой текст) -->
+    <div id="zapis-page">
+        <h2>Zápis do sešitu</h2>
+        <p><strong>Albert Einstein (1879–1955)</strong></p>
+        <p>Byl to geniální fyzik, který změnil naše chápání vesmíru.</p>
+        <p>Jeho nejslavnější rovnice je <strong>E = mc²</strong>. To znamená, že hmota a energie jsou propojené. Malé množství hmoty dokáže uvolnit obrovské množství energie.</p>
+        <p>Dostal Nobelovu cenu za objev fotoelektrického jevu.</p>
+        <!-- ТУТ МОЖЕШЬ ДОБАВИТЬ СВОЙ ТЕКСТ ПОЗЖЕ -->
+    </div>
+</div>
+
+<script>
+    // Список вопросов
+    const questions = [
+        {
+            question: "Za co dostal Einstein Nobelovu cenu?",
+            options: ["Za teorii relativity", "Za fotoelektrický jev", "Za vynález atomové bomby"],
+            correct: 1 // Индекс правильного ответа (0 = A, 1 = B, 2 = C)
+        },
+        {
+            question: "Co znamená rovnice E = mc²?",
+            options: ["Hmotnost a energie jsou propojené", "Rychlost světla je nekonečná", "Gravitace ohýbá čas"],
+            correct: 0
+        }
+    ];
+
+    let currentQuestion = 0;
+    const quizPage = document.getElementById('quiz-page');
+    const zapisPage = document.getElementById('zapis-page');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+
+    // Функция отрисовки вопроса
+    function renderQuestion() {
+        const q = questions[currentQuestion];
+        questionText.innerHTML = `<h2>${q.question}</h2>`;
+        optionsContainer.innerHTML = "";
+
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = "btn";
+            btn.innerText = `${String.fromCharCode(65 + index)}) ${opt}`; // A) Текст, B) Текст и т.д.
+            btn.onclick = () => checkAnswer(btn, index === q.correct);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    // Функция проверки ответа
+    function checkAnswer(button, isCorrect) {
+        // Отключаем все кнопки, чтобы нельзя было нажать несколько раз
+        const allBtns = optionsContainer.querySelectorAll('.btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (isCorrect) {
+            button.classList.add('correct');
+        } else {
+            button.classList.add('wrong');
+        }
+
+        // Ждем 3 секунды и переключаем экран
+        setTimeout(() => {
+            if (currentQuestion < questions.length - 1) {
+                // Если есть еще вопросы - показываем следующий
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                // Если вопросы кончились - показываем запись
+                quizPage.style.display = 'none';
+                zapisPage.style.display = 'block';
+            }
+        }, 3000); // 3000 миллисекунд = 3 секунды
+    }
+
+    // Запуск
+    renderQuestion();
+</script>
+
+</body>
+</html>
